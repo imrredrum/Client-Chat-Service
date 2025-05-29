@@ -31,7 +31,7 @@ const HistoryMessage = () => {
           itemContent={idx => {
             const m = messages[idx]
             return (
-              <Typography>
+              <Typography whiteSpace='pre-wrap'>
                 <strong>{m.role}:</strong> {m.content}
               </Typography>
             )
