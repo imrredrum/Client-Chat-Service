@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { app } from '../utils/firebase'
 
 type User = {
-  id: string
+  uid: string
   name: string
 }
 
@@ -15,7 +15,12 @@ export function useUsers() {
   useEffect(() => {
     const fetchUsers = async () => {
       const snapshot = await getDocs(collection(db, 'users'))
-      setUsers(snapshot.docs.map(doc => doc.data() as User))
+      setUsers(
+        snapshot.docs.map(doc => ({
+          uid: doc.id,
+          ...(doc.data() as { name: string }),
+        }))
+      )
     }
     fetchUsers()
   }, [])

@@ -30,6 +30,7 @@ const ChatApp = () => {
       const msg = {
         uid: uid,
         name: name,
+        user: { uid, name },
         role: 'user',
         content,
         timestamp: new Date().toISOString(),

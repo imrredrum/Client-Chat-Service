@@ -52,8 +52,12 @@ export async function logMention(entry: {
   cateId: string
   cateName: string
   source: 'user'
-  messageId?: string
+  messageId: string
+  messageContent: string
   timestamp: string
+  user: { uid: string; name: string }
 }) {
-  await db.collection('mentions').add(entry)
+  await db
+    .collection('mentions')
+    .add({ ...entry, message: db.collection('messages').doc(entry.messageId) })
 }

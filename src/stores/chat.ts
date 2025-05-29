@@ -3,6 +3,10 @@ import { createStore } from 'zustand'
 export type Message = {
   uid: string
   name: string
+  user: {
+    uid: string
+    name: string
+  }
   role: string
   content: string
   timestamp: string

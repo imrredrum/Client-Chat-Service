@@ -17,7 +17,7 @@ const UserSelect = () => {
   const handleChange = (event: SelectChangeEvent) => {
     update({
       uid: event.target.value,
-      name: users.find(u => u.id === event.target.value)?.name ?? '',
+      name: users.find(u => u.uid === event.target.value)?.name ?? '',
     })
   }
 
@@ -32,7 +32,7 @@ const UserSelect = () => {
         onChange={handleChange}
       >
         {users.map(u => (
-          <MenuItem key={u.id} value={u.id}>
+          <MenuItem key={u.uid} value={u.uid}>
             {u.name}
           </MenuItem>
         ))}
