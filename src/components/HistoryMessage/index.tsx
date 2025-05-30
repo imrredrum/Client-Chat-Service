@@ -1,9 +1,20 @@
+'use client'
+
 import { useChatStore } from '@/providers/chat'
-import { Box, CircularProgress, Typography } from '@mui/material'
-import { Virtuoso } from 'react-virtuoso'
+import { Box, CircularProgress, Paper, Typography } from '@mui/material'
+import dayjs from 'dayjs'
+import { useEffect, useRef } from 'react'
+import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso'
 
 const HistoryMessage = () => {
   const { messages, status } = useChatStore(state => state)
+  const virtuosoRef = useRef<VirtuosoHandle>(null)
+
+  useEffect(() => {
+    if (virtuosoRef.current && messages.length > 0) {
+      virtuosoRef.current.scrollToIndex({ index: messages.length - 1 })
+    }
+  }, [messages.length])
 
   return (
     <>
@@ -21,19 +32,55 @@ const HistoryMessage = () => {
       <Box
         height={400}
         border={1}
-        borderColor='grey.300'
+        borderColor='grey.700'
         borderRadius={2}
         p={1}
       >
         <Virtuoso
+          ref={virtuosoRef}
           style={{ height: '100%' }}
           totalCount={messages.length}
-          itemContent={idx => {
-            const m = messages[idx]
+          itemContent={index => {
+            const m = messages[index]
+            const isUser = m.role === 'user'
+
             return (
-              <Typography whiteSpace='pre-wrap'>
-                <strong>{m.role}:</strong> {m.content}
-              </Typography>
+              <Box
+                display='flex'
+                justifyContent={isUser ? 'flex-end' : 'flex-start'}
+                mb={1}
+              >
+                <Box maxWidth={3 / 4}>
+                  <Typography variant='caption' color='text.secondary' mb={0.5}>
+                    {isUser ? `${m.name}（你）` : 'AI'} ・{' '}
+                    {dayjs(m.timestamp).format('HH:mm:ss')}
+                  </Typography>
+                  <Paper
+                    elevation={2}
+                    sx={theme => ({
+                      px: 2,
+                      py: 1,
+                      bgcolor: isUser
+                        ? theme.palette.primary.dark
+                        : theme.palette.mode === 'dark'
+                        ? theme.palette.grey[800]
+                        : theme.palette.grey[200],
+                      color: isUser
+                        ? theme.palette.common.white
+                        : theme.palette.mode === 'dark'
+                        ? theme.palette.grey[100]
+                        : theme.palette.text.primary,
+                      borderRadius: 2,
+                      borderTopRightRadius: isUser ? 0 : 2,
+                      borderTopLeftRadius: isUser ? 2 : 0,
+                    })}
+                  >
+                    <Typography whiteSpace='pre-wrap' variant='body2'>
+                      {m.content}
+                    </Typography>
+                  </Paper>
+                </Box>
+              </Box>
             )
           }}
         />

@@ -35,7 +35,7 @@ export async function scanKeywords(text: string): Promise<scanResult> {
         results.push({
           keywordId: k.keywordId,
           keywordName: k.keywordName,
-          cateId: data.cateId,
+          cateId: doc.id,
           cateName: data.cateName,
         })
       }

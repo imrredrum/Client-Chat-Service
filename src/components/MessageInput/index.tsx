@@ -1,31 +1,60 @@
 'use client'
 
-import { Button, TextField } from '@mui/material'
-import { useState } from 'react'
+import { Box, Button, TextareaAutosize, TextField } from '@mui/material'
+import { useRef, useState } from 'react'
+
+const DEBOUNCE_INTERVAL = 1000
 
 const MessageInput: React.FC<{
   onSubmit: (content: string) => Promise<void>
 }> = ({ onSubmit }) => {
-  const [input, setInput] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const lastSubmitTime = useRef(0)
+  const formRef = useRef<HTMLFormElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const handleSubmit = async () => {
-    if (input.trim() === '') return
-    await onSubmit(input.trim())
-    setInput('')
+  const handleSubmit = async (formData: FormData) => {
+    const now = Date.now()
+    if (now - lastSubmitTime.current < DEBOUNCE_INTERVAL) return
+    lastSubmitTime.current = now
+
+    const input = formData.get('content') as string
+    if (!input || input.trim() === '') return
+
+    setSubmitting(true)
+    try {
+      await onSubmit(input.trim())
+      if (inputRef.current) {
+        inputRef.current.value = ''
+        inputRef.current.focus()
+      }
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
-    <>
+    <Box
+      component='form'
+      action={handleSubmit}
+      ref={formRef}
+      display='flex'
+      flexDirection='column'
+      gap={1}
+      mt={2}
+    >
       <TextField
+        name='content'
+        multiline
+        maxRows={3}
         fullWidth
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        sx={{ mt: 2 }}
+        inputRef={inputRef}
+        disabled={submitting}
       />
-      <Button onClick={handleSubmit} variant='contained' sx={{ mt: 1 }}>
+      <Button type='submit' variant='contained' loading={submitting}>
         Send
       </Button>
-    </>
+    </Box>
   )
 }
 
