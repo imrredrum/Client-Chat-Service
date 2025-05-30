@@ -1,12 +1,14 @@
 'use client'
 
 import { useChatStore } from '@/providers/chat'
+import { useUserStore } from '@/providers/user'
 import { Box, CircularProgress, Paper, Typography } from '@mui/material'
 import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso'
 
 const HistoryMessage = () => {
+  const name = useUserStore(state => state.name)
   const { messages, status } = useChatStore(state => state)
   const virtuosoRef = useRef<VirtuosoHandle>(null)
 
@@ -52,7 +54,7 @@ const HistoryMessage = () => {
               >
                 <Box maxWidth={3 / 4}>
                   <Typography variant='caption' color='text.secondary' mb={0.5}>
-                    {isUser ? `${m.name}（你）` : 'AI'} ・{' '}
+                    {isUser ? `${name}（你）` : 'AI'} ・{' '}
                     {dayjs(m.timestamp).format('HH:mm:ss')}
                   </Typography>
                   <Paper
